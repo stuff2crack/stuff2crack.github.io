@@ -1,0 +1,903 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>s2c (stuff 2 crack) v.0.9</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #0d1117;
+            color: #c9d1d9;
+            line-height: 1.6;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        h1 {
+            color: #58a6ff;
+            text-align: center;
+            margin-bottom: 10px;
+            font-size: 2.5em;
+        }
+
+        h2 {
+            color: #7ee787;
+            margin: 25px 0 15px;
+            border-bottom: 1px solid #30363d;
+            padding-bottom: 10px;
+        }
+
+        h3 {
+            color: #ffa657;
+            margin: 20px 0 10px;
+            font-size: 1.1em;
+        }
+
+        .quote {
+            color: #8b949e;
+            font-style: italic;
+            margin-bottom: 15px;
+            padding-left: 15px;
+            border-left: 3px solid #58a6ff;
+        }
+
+        .rules {
+            background: #161b22;
+            border: 1px solid #30363d;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+
+        .rules h2 {
+            color: #f85149;
+            border-bottom-color: #f85149;
+        }
+
+        .rules ul {
+            list-style: none;
+            padding-left: 0;
+        }
+
+        .rules li {
+            padding: 8px 0;
+            padding-left: 25px;
+            position: relative;
+        }
+
+        .rules li::before {
+            content: "▸";
+            position: absolute;
+            left: 0;
+            color: #f85149;
+        }
+
+        .note {
+            background: #238636;
+            color: #fff;
+            padding: 15px;
+            border-radius: 6px;
+            margin-top: 15px;
+            font-weight: 500;
+        }
+
+        .legend {
+            background: #161b22;
+            border: 1px solid #30363d;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+
+        .legend-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 8px;
+            background: #0d1117;
+            border-radius: 6px;
+        }
+
+        .symbol {
+            font-size: 1.3em;
+            width: 30px;
+            text-align: center;
+        }
+
+        .search-box {
+            width: 100%;
+            padding: 15px;
+            font-size: 16px;
+            background: #21262d;
+            border: 1px solid #30363d;
+            border-radius: 8px;
+            color: #c9d1d9;
+            margin-bottom: 20px;
+        }
+
+        .search-box:focus {
+            outline: none;
+            border-color: #58a6ff;
+        }
+
+        .section {
+            background: #161b22;
+            border: 1px solid #30363d;
+            border-radius: 8px;
+            margin: 15px 0;
+            overflow: hidden;
+        }
+
+        .section-header {
+            padding: 15px 20px;
+            background: #21262d;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: background 0.2s;
+        }
+
+        .section-header:hover {
+            background: #30363d;
+        }
+
+        .section-title {
+            font-size: 1.2em;
+            font-weight: 600;
+        }
+
+        .toggle {
+            font-size: 0.9em;
+            color: #8b949e;
+        }
+
+        .section-content {
+            padding: 20px;
+            display: none;
+        }
+
+        .section-content.active {
+            display: block;
+        }
+
+        .link-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            padding: 12px;
+            margin: 8px 0;
+            background: #0d1117;
+            border-radius: 6px;
+            transition: background 0.2s;
+        }
+
+        .link-item:hover {
+            background: #21262d;
+        }
+
+        .link-symbol {
+            font-size: 1.2em;
+            flex-shrink: 0;
+        }
+
+        .link-content {
+            flex: 1;
+        }
+
+        .link-name {
+            color: #58a6ff;
+            font-weight: 500;
+            cursor: pointer;
+            text-decoration: none;
+        }
+
+        .link-name:hover {
+            text-decoration: underline;
+        }
+
+        .link-desc {
+            color: #8b949e;
+            font-size: 0.95em;
+            margin-top: 4px;
+        }
+
+        .copy-btn {
+            background: #21262d;
+            border: 1px solid #30363d;
+            color: #c9d1d9;
+            padding: 6px 12px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.85em;
+            transition: all 0.2s;
+        }
+
+        .copy-btn:hover {
+            background: #30363d;
+        }
+
+        .copy-btn.copied {
+            background: #238636;
+            border-color: #238636;
+        }
+
+        .direct-links .link-item {
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .direct-links .link-url {
+            color: #a371f7;
+            font-size: 0.9em;
+            word-break: break-all;
+        }
+
+        .changelog {
+            background: #161b22;
+            border: 1px solid #30363d;
+            border-radius: 8px;
+            padding: 20px;
+            margin-top: 20px;
+        }
+
+        .changelog-entry {
+            margin: 20px 0;
+            padding-left: 20px;
+            border-left: 3px solid #58a6ff;
+        }
+
+        .changelog-entry h4 {
+            color: #7ee787;
+            margin-bottom: 10px;
+        }
+
+        .changelog-entry ul {
+            list-style: none;
+            padding-left: 0;
+        }
+
+        .changelog-entry li {
+            padding: 4px 0;
+            padding-left: 20px;
+            position: relative;
+            color: #8b949e;
+        }
+
+        .changelog-entry li::before {
+            content: "•";
+            position: absolute;
+            left: 0;
+            color: #58a6ff;
+        }
+
+        .risky {
+            border-left: 3px solid #f85149;
+        }
+
+        .gem {
+            border-left: 3px solid #ffd700;
+        }
+
+        footer {
+            text-align: center;
+            margin-top: 40px;
+            padding: 20px;
+            color: #8b949e;
+            font-size: 0.9em;
+        }
+
+        @media (max-width: 600px) {
+            h1 {
+                font-size: 1.8em;
+            }
+            
+            .legend-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .link-item {
+                flex-wrap: wrap;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>s2c (stuff 2 crack) v.0.9</h1>
+        
+        <input type="text" class="search-box" id="searchBox" placeholder="Search sites..." onkeyup="searchSites()">
+
+        <div class="rules">
+            <h2>⚡ FUNDAMENTAL RULES</h2>
+            <ul>
+                <li>ALWAYS MAKE SURE TO VISIT THESE SITES W/ FIREFOX + UBLOCK</li>
+                <li>RECOMMENDED TO USE QBITTORRENT AS YOUR TORRENT APP</li>
+                <li>RECOMMENDED TO USE MALWAREBYTES (free trial) OR BITDEFENDER AS YOUR ANTIVIRUS</li>
+                <li>IF YOU TRULY WANNA USE A VPN, USE MULLVAD VPN (PAID)</li>
+                <li>IF YOU ARE UNSURE IF IT'S TRULY MALWARE, USE VIRUSTOTAL OR MALWAREBYTES</li>
+                <li>IF YOU NEED TO BE <strong>REALLY</strong> SURE, USE TRIAGE (site: <a href="https://tria.ge" target="_blank" style="color:#58a6ff;">tria.ge</a>) FOR A SANDBOX WHERE YOU CAN TEST IF IT'S MALWARE</li>
+            </ul>
+            <div class="note">
+                NOTE: ALL THESE SITES ARE SAFE, AS LONG AS YOU DON'T WANDER OFF TOO MUCH. I HAVE PERSONALLY TRIED MULTIPLE OF THESE SITES AND HAVE CONCLUDED THAT THEY ARE ALRIGHT.
+            </div>
+        </div>
+
+        <div class="legend">
+            <h2>📖 LEGEND</h2>
+            <div class="legend-grid">
+                <div class="legend-item"><span class="symbol">💎</span> <span>A gem. Would HIGHLY recommend.</span></div>
+                <div class="legend-item"><span class="symbol">🌟</span> <span>I recommend it.</span></div>
+                <div class="legend-item"><span class="symbol">⭐</span> <span>I've used it and it worked.</span></div>
+                <div class="legend-item"><span class="symbol">✨</span> <span>It seems alright, but haven't tried it yet.</span></div>
+                <div class="legend-item"><span class="symbol">⚠️</span> <span>Risky (use caution).</span></div>
+                <div class="legend-item"><span class="symbol">❓</span> <span>Haven't tried it yet (unknown quality).</span></div>
+            </div>
+        </div>
+
+        <div class="section">
+            <div class="section-header" onclick="toggleSection(this)">
+                <span class="section-title">🔗 USEFUL LINKS</span>
+                <span class="toggle">[click to expand]</span>
+            </div>
+            <div class="section-content">
+                <p class="quote">"And this is where it begins."</p>
+                <div class="link-item gem" data-name="fmhy.net">
+                    <span class="link-symbol">💎</span>
+                    <div class="link-content">
+                        <a href="https://fmhy.net" class="link-name" target="_blank">fmhy.net</a>
+                        <p class="link-desc">basically where YOU can find useful links too</p>
+                    </div>
+                    <button class="copy-btn" onclick="copyLink('https://fmhy.net', this)">Copy</button>
+                </div>
+                <div class="link-item" data-name="ripped.guide">
+                    <span class="link-symbol">🌟</span>
+                    <div class="link-content">
+                        <a href="https://ripped.guide" class="link-name" target="_blank">ripped.guide</a>
+                        <p class="link-desc">similar to FMHY</p>
+                    </div>
+                    <button class="copy-btn" onclick="copyLink('https://ripped.guide', this)">Copy</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="section">
+            <div class="section-header" onclick="toggleSection(this)">
+                <span class="section-title">🌊 TORRENTS</span>
+                <span class="toggle">[click to expand]</span>
+            </div>
+            <div class="section-content">
+                <p class="quote">"Knowledge is power, and torrents are knowledge. And malware too, but mostly knowledge."</p>
+                <div class="link-item" data-name="virgil.samidy.com">
+                    <span class="link-symbol">✨</span>
+                    <div class="link-content">
+                        <a href="https://virgil.samidy.com" class="link-name" target="_blank">virgil.samidy.com</a>
+                        <p class="link-desc">you can search torrents and shi</p>
+                    </div>
+                    <button class="copy-btn" onclick="copyLink('https://virgil.samidy.com', this)">Copy</button>
+                </div>
+                <div class="link-item risky" data-name="1337x.to">
+                    <span class="link-symbol">⚠️</span>
+                    <div class="link-content">
+                        <a href="https://1337x.to" class="link-name" target="_blank">1337x.to</a>
+                        <p class="link-desc">many torrents, has almost everything, make sure to search for trusted uploaders (ex: FitGirl, DODI, CracksHash etc.)</p>
+                    </div>
+                    <button class="copy-btn" onclick="copyLink('https://1337x.to', this)">Copy</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="section">
+            <div class="section-header" onclick="toggleSection(this)">
+                <span class="section-title">🎮 GAMING</span>
+                <span class="toggle">[click to expand]</span>
+            </div>
+            <div class="section-content">
+                <p class="quote">"The only thing better than a game is a free game."</p>
+                <div class="link-item gem" data-name="fitgirl-repacks.site">
+                    <span class="link-symbol">💎</span>
+                    <div class="link-content">
+                        <a href="https://fitgirl-repacks.site" class="link-name" target="_blank">fitgirl-repacks.site</a>
+                        <p class="link-desc">repacked games</p>
+                    </div>
+                    <button class="copy-btn" onclick="copyLink('https://fitgirl-repacks.site', this)">Copy</button>
+                </div>
+                <div class="link-item" data-name="dodi-repacks.site">
+                    <span class="link-symbol">🌟</span>
+                    <div class="link-content">
+                        <a href="https://dodi-repacks.site" class="link-name" target="_blank">dodi-repacks.site</a>
+                        <p class="link-desc">repacked games</p>
+                    </div>
+                    <button class="copy-btn" onclick="copyLink('https://dodi-repacks.site', this)">Copy</button>
+                </div>
+                <div class="link-item" data-name="mrpcgamer.net">
+                    <span class="link-symbol">🌟</span>
+                    <div class="link-content">
+                        <a href="https://mrpcgamer.net" class="link-name" target="_blank">mrpcgamer.net / online-fix.me</a>
+                        <p class="link-desc">has games w/ online</p>
+                    </div>
+                    <button class="copy-btn" onclick="copyLink('https://mrpcgamer.net', this)">Copy</button>
+                </div>
+                <div class="link-item" data-name="cracked-games.org">
+                    <span class="link-symbol">❓</span>
+                    <div class="link-content">
+                        <a href="https://cracked-games.org" class="link-name" target="_blank">cracked-games.org</a>
+                        <p class="link-desc">it's on the Pirated Games Mega Thread so it's (probably) alright</p>
+                    </div>
+                    <button class="copy-btn" onclick="copyLink('https://cracked-games.org', this)">Copy</button>
+                </div>
+                <div class="link-item" data-name="ankergames.net">
+                    <span class="link-symbol">✨</span>
+                    <div class="link-content">
+                        <a href="https://ankergames.net" class="link-name" target="_blank">ankergames.net</a>
+                        <p class="link-desc">well made website</p>
+                    </div>
+                    <button class="copy-btn" onclick="copyLink('https://ankergames.net', this)">Copy</button>
+                </div>
+                <div class="link-item" data-name="scene.cat">
+                    <span class="link-symbol">✨</span>
+                    <div class="link-content">
+                        <a href="https://scene.cat" class="link-name" target="_blank">scene.cat</a>
+                        <p class="link-desc">a LOT of games, like WHAT</p>
+                    </div>
+                    <button class="copy-btn" onclick="copyLink('https://scene.cat', this)">Copy</button>
+                </div>
+                <div class="link-item" data-name="abandonwaregames.net">
+                    <span class="link-symbol">🌟</span>
+                    <div class="link-content">
+                        <a href="https://abandonwaregames.net" class="link-name" target="_blank">abandonwaregames.net</a>
+                        <p class="link-desc">VERY old ass games (ex: simpsons hit & run)</p>
+                    </div>
+                    <button class="copy-btn" onclick="copyLink('https://abandonwaregames.net', this)">Copy</button>
+                </div>
+                <div class="link-item" data-name="myabandonware.com">
+                    <span class="link-symbol">⭐</span>
+                    <div class="link-content">
+                        <a href="https://myabandonware.com" class="link-name" target="_blank">myabandonware.com</a>
+                        <p class="link-desc">also VERY old ass games</p>
+                    </div>
+                    <button class="copy-btn" onclick="copyLink('https://myabandonware.com', this)">Copy</button>
+                </div>
+                <div class="link-item" data-name="romsgames.net">
+                    <span class="link-symbol">🌟</span>
+                    <div class="link-content">
+                        <a href="https://romsgames.net" class="link-name" target="_blank">romsgames.net</a>
+                        <p class="link-desc">shit ton of roms, even has emulators</p>
+                    </div>
+                    <button class="copy-btn" onclick="copyLink('https://romsgames.net', this)">Copy</button>
+                </div>
+                <div class="link-item" data-name="nswpedia.com">
+                    <span class="link-symbol">🌟</span>
+                    <div class="link-content">
+                        <a href="https://nswpedia.com" class="link-name" target="_blank">nswpedia.com</a>
+                        <p class="link-desc">roms.... BUT FOR NINTENDO SWITCH</p>
+                    </div>
+                    <button class="copy-btn" onclick="copyLink('https://nswpedia.com', this)">Copy</button>
+                </div>
+                <div class="link-item" data-name="an1.com">
+                    <span class="link-symbol">🌟</span>
+                    <div class="link-content">
+                        <a href="https://an1.com" class="link-name" target="_blank">an1.com</a>
+                        <p class="link-desc">modded APKs, for all my android homies out there</p>
+                    </div>
+                    <button class="copy-btn" onclick="copyLink('https://an1.com', this)">Copy</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="section">
+            <div class="section-header" onclick="toggleSection(this)">
+                <span class="section-title">🎬 MOVIES</span>
+                <span class="toggle">[click to expand]</span>
+            </div>
+            <div class="section-content">
+                <p class="quote">"If Netflix had all the movies I wanted, I wouldn't be here."</p>
+                <div class="link-item gem" data-name="streamex.net">
+                    <span class="link-symbol">💎</span>
+                    <div class="link-content">
+                        <a href="https://streamex.net" class="link-name" target="_blank">streamex.net</a>
+                        <p class="link-desc">lowkey goated, I personally use it</p>
+                    </div>
+                    <button class="copy-btn" onclick="copyLink('https://streamex.net', this)">Copy</button>
+                </div>
+                <div class="link-item" data-name="zstream.mov">
+                    <span class="link-symbol">🌟</span>
+                    <div class="link-content">
+                        <a href="https://zstream.mov" class="link-name" target="_blank">zstream.mov</a>
+                        <p class="link-desc">fork of p-stream, also lowkey goated</p>
+                    </div>
+                    <button class="copy-btn" onclick="copyLink('https://zstream.mov', this)">Copy</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="section">
+            <div class="section-header" onclick="toggleSection(this)">
+                <span class="section-title">💻 CRACKED APPS</span>
+                <span class="toggle">[click to expand]</span>
+            </div>
+            <div class="section-content">
+                <p class="quote">"Free software isn't really free. It's just paid for by your data, unless you crack it."</p>
+                <div class="link-item" data-name="crackshash.com">
+                    <span class="link-symbol">🌟</span>
+                    <div class="link-content">
+                        <a href="https://crackshash.com" class="link-name" target="_blank">crackshash.com</a>
+                        <p class="link-desc">they even got some APKs too, on top of the shit ton of apps</p>
+                    </div>
+                    <button class="copy-btn" onclick="copyLink('https://crackshash.com', this)">Copy</button>
+                </div>
+                <div class="link-item gem" data-name="monkrus.ws">
+                    <span class="link-symbol">💎</span>
+                    <div class="link-content">
+                        <a href="https://monkrus.ws" class="link-name" target="_blank">monkrus.ws</a>
+                        <p class="link-desc">this mf got almost everything (Make sure to use google translate!)</p>
+                    </div>
+                    <button class="copy-btn" onclick="copyLink('https://monkrus.ws', this)">Copy</button>
+                </div>
+                <div class="link-item" data-name="czsofts.com">
+                    <span class="link-symbol">🌟</span>
+                    <div class="link-content">
+                        <a href="https://czsofts.com" class="link-name" target="_blank">czsofts.com</a>
+                        <p class="link-desc">I personally got the Adobe Master Collection 2025 from them, would recommend</p>
+                    </div>
+                    <button class="copy-btn" onclick="copyLink('https://czsofts.com', this)">Copy</button>
+                </div>
+                <div class="link-item" data-name="lrepacks.net">
+                    <span class="link-symbol">✨</span>
+                    <div class="link-content">
+                        <a href="https://lrepacks.net" class="link-name" target="_blank">lrepacks.net</a>
+                        <p class="link-desc">repacks... but for apps?? (Make sure to use google translate!)</p>
+                    </div>
+                    <button class="copy-btn" onclick="copyLink('https://lrepacks.net', this)">Copy</button>
+                </div>
+                <div class="link-item" data-name="cracksurl.com">
+                    <span class="link-symbol">✨</span>
+                    <div class="link-content">
+                        <a href="https://cracksurl.com" class="link-name" target="_blank">cracksurl.com</a>
+                        <p class="link-desc">also a ton of cracked apps (Use their tutorial! <a href="https://cracksurl.com/how-to-download/" target="_blank" style="color:#58a6ff;">https://cracksurl.com/how-to-download/</a>)</p>
+                    </div>
+                    <button class="copy-btn" onclick="copyLink('https://cracksurl.com', this)">Copy</button>
+                </div>
+                <div class="link-item" data-name="downloadpirate.com">
+                    <span class="link-symbol">✨</span>
+                    <div class="link-content">
+                        <a href="https://downloadpirate.com" class="link-name" target="_blank">downloadpirate.com</a>
+                        <p class="link-desc">plugins and addons for various Adobe apps (goes well with the Adobe Master Collection)</p>
+                    </div>
+                    <button class="copy-btn" onclick="copyLink('https://downloadpirate.com', this)">Copy</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="section">
+            <div class="section-header" onclick="toggleSection(this)">
+                <span class="section-title">🎵 MUSIC</span>
+                <span class="toggle">[click to expand]</span>
+            </div>
+            <div class="section-content">
+                <p class="quote">"Every song wants to be heard. Some just take the scenic route."</p>
+                <div class="link-item" data-name="artistgrid.cx">
+                    <span class="link-symbol">🌟</span>
+                    <div class="link-content">
+                        <a href="https://artistgrid.cx" class="link-name" target="_blank">artistgrid.cx</a>
+                        <p class="link-desc">shit ton of unreleased music</p>
+                    </div>
+                    <button class="copy-btn" onclick="copyLink('https://artistgrid.cx', this)">Copy</button>
+                </div>
+                <div class="link-item gem" data-name="unvaulted.cc">
+                    <span class="link-symbol">💎</span>
+                    <div class="link-content">
+                        <a href="https://unvaulted.cc" class="link-name" target="_blank">unvaulted.cc</a>
+                        <p class="link-desc">also unreleased music, but u can easily download it</p>
+                    </div>
+                    <button class="copy-btn" onclick="copyLink('https://unvaulted.cc', this)">Copy</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="section">
+            <div class="section-header" onclick="toggleSection(this)">
+                <span class="section-title">⚙️ GITHUB BULLSHIT</span>
+                <span class="toggle">[click to expand]</span>
+            </div>
+            <div class="section-content">
+                <p class="quote">"GitHub is either someone's masterpiece or someone's 3AM mistake."</p>
+                <div class="link-item" data-name="github.com/linexjlin/GPTs">
+                    <span class="link-symbol">🌟</span>
+                    <div class="link-content">
+                        <a href="https://github.com/linexjlin/GPTs" class="link-name" target="_blank">github.com/linexjlin/GPTs</a>
+                        <p class="link-desc">leaked AI prompts (that im guessing they costed money)</p>
+                    </div>
+                    <button class="copy-btn" onclick="copyLink('https://github.com/linexjlin/GPTs', this)">Copy</button>
+                </div>
+                <div class="link-item risky" data-name="github.com/gibbed/SteamAchievementManager">
+                    <span class="link-symbol">⚠️</span>
+                    <div class="link-content">
+                        <a href="https://github.com/gibbed/SteamAchievementManager" class="link-name" target="_blank">github.com/gibbed/SteamAchievementManager</a>
+                        <p class="link-desc">add/delete steam achievements at your own will (Using this tool might put your Steam account at risk!)</p>
+                    </div>
+                    <button class="copy-btn" onclick="copyLink('https://github.com/gibbed/SteamAchievementManager', this)">Copy</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="section">
+            <div class="section-header" onclick="toggleSection(this)">
+                <span class="section-title">📚 BOOKS</span>
+                <span class="toggle">[click to expand]</span>
+            </div>
+            <div class="section-content">
+                <p class="quote">"I'm the Globglogabgalab, I love books, and this basement is a true treasure trove"</p>
+                <div class="link-item gem" data-name="annas-archive.gl">
+                    <span class="link-symbol">💎</span>
+                    <div class="link-content">
+                        <a href="https://annas-archive.gl" class="link-name" target="_blank">annas-archive.gl</a>
+                        <p class="link-desc">the BIGGEST book collection ever (I think)</p>
+                    </div>
+                    <button class="copy-btn" onclick="copyLink('https://annas-archive.gl', this)">Copy</button>
+                </div>
+                <div class="link-item" data-name="z-lib.gd">
+                    <span class="link-symbol">✨</span>
+                    <div class="link-content">
+                        <a href="https://z-lib.gd" class="link-name" target="_blank">z-lib.gd</a>
+                        <p class="link-desc">also a pretty big book collection</p>
+                    </div>
+                    <button class="copy-btn" onclick="copyLink('https://z-lib.gd', this)">Copy</button>
+                </div>
+                <div class="link-item" data-name="wotaku.wiki">
+                    <span class="link-symbol">✨</span>
+                    <div class="link-content">
+                        <a href="https://wotaku.wiki" class="link-name" target="_blank">wotaku.wiki</a>
+                        <p class="link-desc">a HUGE wiki for manga and anime (yes ik it should prolly be in the resource hubs but whatever)</p>
+                    </div>
+                    <button class="copy-btn" onclick="copyLink('https://wotaku.wiki', this)">Copy</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="section">
+            <div class="section-header" onclick="toggleSection(this)">
+                <span class="section-title">🎲 MISC</span>
+                <span class="toggle">[click to expand]</span>
+            </div>
+            <div class="section-content">
+                <p class="quote">"I actually don't have a nice quote here, this is just the miscellaneous stuff that didn't fit elsewhere."</p>
+                <div class="link-item" data-name="deepshi.ai">
+                    <span class="link-symbol">🌟</span>
+                    <div class="link-content">
+                        <a href="https://deepshi.ai" class="link-name" target="_blank">deepshi.ai</a>
+                        <p class="link-desc">uncensored ai</p>
+                    </div>
+                    <button class="copy-btn" onclick="copyLink('https://deepshi.ai', this)">Copy</button>
+                </div>
+                <div class="link-item gem" data-name="cobalt.tools">
+                    <span class="link-symbol">💎</span>
+                    <div class="link-content">
+                        <a href="https://cobalt.tools" class="link-name" target="_blank">cobalt.tools</a>
+                        <p class="link-desc">video/audio downloader</p>
+                    </div>
+                    <button class="copy-btn" onclick="copyLink('https://cobalt.tools', this)">Copy</button>
+                </div>
+                <div class="link-item" data-name="decomps.fun">
+                    <span class="link-symbol">✨</span>
+                    <div class="link-content">
+                        <a href="https://decomps.fun" class="link-name" target="_blank">decomps.fun</a>
+                        <p class="link-desc">game decompilations, because why not?</p>
+                    </div>
+                    <button class="copy-btn" onclick="copyLink('https://decomps.fun', this)">Copy</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="section direct-links">
+            <div class="section-header" onclick="toggleSection(this)">
+                <span class="section-title">⬇️ DIRECT LINKS</span>
+                <span class="toggle">[click to expand]</span>
+            </div>
+            <div class="section-content">
+                <p class="quote">"For when you're too lazy to search the Useful Links"</p>
+                <div class="link-item" data-name="Adobe Master Collection 2026">
+                    <span class="link-symbol">🌟</span>
+                    <div class="link-content">
+                        <span class="link-name">Adobe Master Collection 2026</span>
+                        <p class="link-url"><a href="https://1337x.to/torrent/6664447/Adobe-Master-Collection-2026-v3-Cracked-CZsofts/" target="_blank" style="color:#a371f7;">1337x link</a> OR <a href="https://w18.monkrus.ws/2026/05/adobe-master-collection-2026-rus-eng-v3.html" target="_blank" style="color:#a371f7;">Monkrus link</a></p>
+                    </div>
+                    <button class="copy-btn" onclick="copyLink('https://w18.monkrus.ws/2026/05/adobe-master-collection-2026-rus-eng-v3.html', this)">Copy</button>
+                </div>
+                <div class="link-item" data-name="Office 365">
+                    <span class="link-symbol">🌟</span>
+                    <div class="link-content">
+                        <span class="link-name">Office 365</span>
+                        <p class="link-desc">"irm https://get.activated.win | iex" in PowerShell (w/ admin). I recommend choosing option 3.</p>
+                    </div>
+                    <button class="copy-btn" onclick="copyText('irm https://get.activated.win | iex', this)">Copy</button>
+                </div>
+                <div class="link-item risky" data-name="FL Studio">
+                    <span class="link-symbol">⚠️</span>
+                    <div class="link-content">
+                        <span class="link-name">FL Studio</span>
+                        <p class="link-url"><a href="https://vstorrent.org/fl-studio-producer-edition-20-8-4-2576-flex-extensions-addition-plugins-win-x86-x64/" target="_blank" style="color:#a371f7;">https://vstorrent.org/fl-studio-producer-edition-20-8-4-2576-flex-extensions-addition-plugins-win-x86-x64/</a></p>
+                    </div>
+                    <button class="copy-btn" onclick="copyLink('https://vstorrent.org/fl-studio-producer-edition-20-8-4-2576-flex-extensions-addition-plugins-win-x86-x64/', this)">Copy</button>
+                </div>
+                <div class="link-item" data-name="DiskGenius">
+                    <span class="link-symbol">🌟</span>
+                    <div class="link-content">
+                        <span class="link-name">DiskGenius</span>
+                        <p class="link-url"><a href="https://1337x.to/torrent/6666260/DiskGenius-Professional-v6-2-0-1829-Fix-CracksHash/" target="_blank" style="color:#a371f7;">https://1337x.to/torrent/6666260/DiskGenius-Professional-v6-2-0-1829-Fix-CracksHash/</a></p>
+                    </div>
+                    <button class="copy-btn" onclick="copyLink('https://1337x.to/torrent/6666260/DiskGenius-Professional-v6-2-0-1829-Fix-CracksHash/', this)">Copy</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="changelog">
+            <h2>📜 CHANGELOG</h2>
+            <p class="quote">"Look how far we've evolved."</p>
+            
+            <div class="changelog-entry">
+                <h4>Version 0.9 (LATEST)</h4>
+                <ul>
+                    <li>New Feature: Added Legend section with symbol rating system (💎🌟⭐✨⚠️❓)</li>
+                    <li>Visual Update: All sites now have symbols indicating personal experience and recommendation level</li>
+                    <li>Symbols Explained: 💎 gems, 🌟 recommended, ⭐ used & worked, ✨ seems alright, ⚠️ risky, ❓ unknown</li>
+                </ul>
+            </div>
+            
+            <div class="changelog-entry">
+                <h4>Version 0.8</h4>
+                <ul>
+                    <li>Changelog: Created changelog, also included older versions in it (v.0.7, v.0.6, v.0.2, v.0.1)</li>
+                    <li>Security Update: Added option to use Triage (tria.ge) for a malware sandbox</li>
+                    <li>Popular Programs: Changed to Direct Links</li>
+                    <li>Resources: Added ripped.guide as another resource hub</li>
+                    <li>Gaming: Added scene.cat (massive game database)</li>
+                    <li>Gaming: Added myabandonware.com for legacy games</li>
+                    <li>Gaming: Added cracked-games.org (listed on Pirated Games Mega Thread)</li>
+                    <li>Gaming: Added ankergames.net</li>
+                    <li>Apps: Added lrepacks.net (with translation warning)</li>
+                    <li>Apps: Added cracksurl.com (with tutorial link)</li>
+                    <li>Apps: Added downloadpirate.com for Adobe plugins/addons</li>
+                    <li>Books: Added z-lib.gd and wotaku.wiki (manga and anime wiki)</li>
+                    <li>Misc: Added cobalt.tools for safe media downloading</li>
+                    <li>Misc: Added decomps.fun for rather no reason, just thought it looked cool</li>
+                    <li>GitHub Bullshit: Added github.com/gibbed/SteamAchievementManager (w/ risk warning)</li>
+                    <li>Safety: Removed vstorrent.org from Torrents section (redundant/unnecessary risk)</li>
+                    <li>General: Updated various links and safety notes</li>
+                    <li>Note: Added note: "ALL THESE SITES ARE SAFE, AS LONG AS YOU DON'T WANDER OFF TOO MUCH. I HAVE PERSONALLY TRIED MULTIPLE OF THESE SITES AND HAVE CONCLUDED THAT THEY ARE ALRIGHT."</li>
+                </ul>
+            </div>
+            
+            <div class="changelog-entry">
+                <h4>Version 0.7</h4>
+                <ul>
+                    <li>Rules: Changed to Fundamental Rules</li>
+                    <li>Security Update: Added recommendation for qBitTorrent as the preferred torrent client</li>
+                    <li>Security Update: Added Bitdefender as an alternative antivirus recommendation</li>
+                    <li>Security Update: Added Mullvad VPN recommendation for paid VPN usage</li>
+                    <li>Torrents: Removed vstorrent.org from the main torrent list to reduce risk</li>
+                    <li>Gaming: Added abandonwaregames.net for legacy games</li>
+                    <li>Gaming: Added romsgames.net and nswpedia.com for ROMs and emulators</li>
+                    <li>Apps: Removed appdoze.net and monkrus.dvuzu.com (replaced with official monkrus.ws)</li>
+                    <li>Apps: Added warning to use Google Translate for m0nkrus</li>
+                    <li>Books: Moved annas-archive.gl to its own dedicated "BOOKS" section with a new quote</li>
+                    <li>Misc: Added deepshi.ai to the miscellaneous section</li>
+                    <li>Popular Programs: Added DiskGenius to the direct links section</li>
+                    <li>General: Various link updates and safety warnings added (ex: trusted uploader warnings)</li>
+                </ul>
+            </div>
+            
+            <div class="changelog-entry">
+                <h4>Version 0.6</h4>
+                <ul>
+                    <li>Initial release of the S2C list, after 2 demos (v.0.1 and v.0.2)</li>
+                    <li>Included basic sections for Torrents, Gaming, Movies, Cracked Apps, Music, and GitHub Bullshit</li>
+                    <li>Established fundamental safety rules regarding Firefox, uBlock, and Malwarebytes</li>
+                </ul>
+            </div>
+            
+            <div class="changelog-entry">
+                <h4>Version 0.2 (Demo 2)</h4>
+                <ul>
+                    <li>New Philosophy: Shifted from "direct files" to "peak sites", now providing sources instead of just specific cracks</li>
+                    <li>New Sites Added: fmhy.net (Resource hub), virgil.samidy.com/vstorrent.org (Torrents), fitgirlrepack.site/steamrip.com/dodi-repacks.site/mrpcgamer.net/an1.com (Gaming), streamex.net (Movies), crackshash.com/appdoze.net/monkrus.dvuzu.com (Cracked Apps), annas-archive.gl (Books)</li>
+                    <li>Safety: Still lacked explicit safety tool recommendations (antivirus, browser config)</li>
+                </ul>
+            </div>
+            
+            <div class="changelog-entry">
+                <h4>Version 0.1 (Demo)</h4>
+                <ul>
+                    <li>Added disclaimer: "ALL THESE FILES HAVE BEEN TESTED AND ARE CONCLUDED NOT TO BE VIRUSES."</li>
+                    <li>Programs listed: Adobe Master Collection, Office 365, FL Studio</li>
+                    <li>Links provided: Adobe Master Collection 2025 (CZsofts via 1337x), Office 365 Activation (via get.activated.win PowerShell script), FL Studio (via vstorrent.org)</li>
+                    <li>Limitations: No general link repository, no safety tool recommendations beyond the disclaimer, no antivirus/browser config</li>
+                </ul>
+            </div>
+        </div>
+
+        <footer>
+            <p>s2c (stuff 2 crack) v.0.9 | Stay safe out there</p>
+        </footer>
+    </div>
+
+    <script>
+        function toggleSection(header) {
+            const content = header.nextElementSibling;
+            const toggle = header.querySelector('.toggle');
+            
+            if (content.classList.contains('active')) {
+                content.classList.remove('active');
+                toggle.textContent = '[click to expand]';
+            } else {
+                content.classList.add('active');
+                toggle.textContent = '[click to collapse]';
+            }
+        }
+
+        function copyLink(url, btn) {
+            navigator.clipboard.writeText(url).then(() => {
+                btn.textContent = 'Copied!';
+                btn.classList.add('copied');
+                setTimeout(() => {
+                    btn.textContent = 'Copy';
+                    btn.classList.remove('copied');
+                }, 2000);
+            });
+        }
+
+        function copyText(text, btn) {
+            navigator.clipboard.writeText(text).then(() => {
+                btn.textContent = 'Copied!';
+                btn.classList.add('copied');
+                setTimeout(() => {
+                    btn.textContent = 'Copy';
+                    btn.classList.remove('copied');
+                }, 2000);
+            });
+        }
+
+        function searchSites() {
+            const input = document.getElementById('searchBox').value.toLowerCase();
+            const items = document.querySelectorAll('.link-item');
+            
+            items.forEach(item => {
+                const name = item.getAttribute('data-name').toLowerCase();
+                const desc = item.textContent.toLowerCase();
+                
+                if (name.includes(input) || desc.includes(input)) {
+                    item.style.display = 'flex';
+                } else {
+                    item.style.display = 'none';
+                }
+            });
+        }
+
+        // Expand all sections by default
+        document.querySelectorAll('.section-content').forEach(section => {
+            section.classList.add('active');
+        });
+        document.querySelectorAll('.toggle').forEach(toggle => {
+            toggle.textContent = '[click to collapse]';
+        });
+    </script>
+</body>
+</html>
